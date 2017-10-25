@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+
+require 'bundler/setup'
+require 'activerecord/jsonb/associations'
+
+ActiveRecord::Base.logger = Logger.new(STDOUT)
+
+require 'pry'
+Pry.start
