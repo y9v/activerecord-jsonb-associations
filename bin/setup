@@ -1,6 +1,31 @@
-#!/usr/bin/env bash
-set -euo pipefail
-IFS=$'\n\t'
-set -vx
+#!/usr/bin/env ruby
 
-bundle install
+require 'pathname'
+require 'fileutils'
+
+def system!(*args)
+  system(*args) || abort("\n== Command #{args} failed ==")
+end
+
+FileUtils.chdir(Pathname.new(File.expand_path('../../', __FILE__))) do
+  puts '== Installing dependencies =='
+  system! 'gem install bundler --conservative'
+  system('bundle check') || system!('bundle install')
+
+  puts "\n== Creating db config file =="
+  unless File.exist? 'spec/config/database.yml'
+    db_config = File.read('spec/config/database.yml.sample')
+
+    print 'Enter your PostgreSQL username: '
+    db_username = gets.chomp
+
+    File.write(
+      'spec/config/database.yml',
+      db_config.gsub('%USERNAME%', db_username)
+    )
+  end
+
+  puts "\n== Creating test database =="
+  system! 'dropdb activerecord_jsonb_associations_test'
+  system! 'createdb activerecord_jsonb_associations_test'
+end
