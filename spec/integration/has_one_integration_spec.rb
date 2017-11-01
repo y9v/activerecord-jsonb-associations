@@ -1,5 +1,5 @@
 # rubocop:disable Metrics/BlockLength
-RSpec.shared_examples ':has_one with JSONB store' do
+RSpec.shared_examples ':has_one association' do |store_type:|
   let(:child_name) { child_model.model_name.element }
 
   describe '#association' do
@@ -10,8 +10,11 @@ RSpec.shared_examples ':has_one with JSONB store' do
 
   describe '#association' do
     before do
-      child_model.send "#{store}=", foreign_key => parent_model.id
-      child_model.save
+      if store_type == :jsonb
+        child_model.update store => { foreign_key.to_s => parent_model.id }
+      else
+        child_model.update foreign_key => parent_model.id
+      end
     end
 
     it 'properly loads association from parent model' do
@@ -24,16 +27,22 @@ RSpec.shared_examples ':has_one with JSONB store' do
       parent_model.send "#{child_name}=", child_model
     end
 
-    it 'sets and persists foreign key on child model' do
+    it 'sets and persists foreign key in jsonb store on child model',
+       if: store_type.eql?(:jsonb) do
       expect(
         child_model.reload.send(store)
       ).to eq(foreign_key.to_s => parent_model.id)
     end
+
+    it 'sets and persists regular foreign key on child model',
+       if: store_type.eql?(:regular) do
+      expect(child_model.reload.send(foreign_key)).to eq(parent_model.id)
+    end
   end
 
-  describe 'association_id' do
+  describe 'association_id', if: store_type.eql?(:jsonb) do
     before do
-      child_model.send(store)[foreign_key.to_s] = parent_model.id
+      child_model.update store => { foreign_key.to_s => parent_model.id }
     end
 
     it 'reads foreign id from specified :store column by foreign key' do
@@ -41,7 +50,7 @@ RSpec.shared_examples ':has_one with JSONB store' do
     end
   end
 
-  describe '#association_id=' do
+  describe '#association_id=', if: store_type.eql?(:jsonb) do
     before do
       child_model.send "#{foreign_key}=", parent_model.id
     end
@@ -56,10 +65,15 @@ RSpec.shared_examples ':has_one with JSONB store' do
       parent_model.send "build_#{child_name}"
     end
 
-    it 'sets foreign key on child model' do
+    it 'sets foreign key on child model in jsonb store',
+       if: store_type.eql?(:jsonb) do
       expect(
         built_association.send(store)
       ).to eq(foreign_key.to_s => parent_model.id)
+    end
+
+    it 'sets foreign key on child model', if: store_type.eql?(:regular) do
+      expect(built_association.send(foreign_key)).to eq(parent_model.id)
     end
   end
 
@@ -68,10 +82,18 @@ RSpec.shared_examples ':has_one with JSONB store' do
       parent_model.send "create_#{child_name}"
     end
 
-    it 'sets and persists foreign key on child model' do
+    it 'sets and persists foreign key on child model in jsonb store',
+       if: store_type.eql?(:jsonb) do
       expect(
         created_association.reload.send(store)
       ).to eq(foreign_key.to_s => parent_model.id)
+    end
+
+    it 'sets and persists foreign key on child model',
+       if: store_type.eql?(:regular) do
+      expect(
+        created_association.reload.send(foreign_key)
+      ).to eq(parent_model.id)
     end
   end
 
@@ -141,27 +163,30 @@ end
 
 RSpec.describe ':has_one' do
   context 'regular association' do
-    let(:parent_model) { User.create }
-    let(:child_model) { Profile.new }
-    let(:child_name) { child_model.model_name.element }
+    include_examples ':has_one association', store_type: :regular do
+      let(:parent_model) { User.create }
+      let(:child_model) { Profile.new }
+      let(:foreign_key) { :user_id }
+    end
   end
 
   context 'association with :store option set on child model' do
-    let(:child_model) { Account.new }
-    let(:store) { :extra }
-
     context 'with default options' do
-      let(:parent_model) { User.create }
-      let(:foreign_key) { :user_id }
-
-      include_examples ':has_one with JSONB store'
+      include_examples ':has_one association', store_type: :jsonb do
+        let(:parent_model) { User.create }
+        let(:child_model) { Account.new }
+        let(:store) { :extra }
+        let(:foreign_key) { :user_id }
+      end
     end
 
     context 'with non-default :options' do
-      let(:parent_model) { GoodsSupplier.create }
-      let(:foreign_key) { :supplier_id }
-
-      include_examples ':has_one with JSONB store'
+      include_examples ':has_one association', store_type: :jsonb do
+        let(:parent_model) { GoodsSupplier.create }
+        let(:child_model) { Account.new }
+        let(:store) { :extra }
+        let(:foreign_key) { :supplier_id }
+      end
     end
   end
 
