@@ -138,7 +138,6 @@ RSpec.shared_examples ':has_one with JSONB store' do
     end
   end
 end
-# rubocop:enable Metrics/BlockLength
 
 RSpec.describe ':has_one' do
   context 'regular association' do
@@ -163,6 +162,20 @@ RSpec.describe ':has_one' do
       let(:foreign_key) { :supplier_id }
 
       include_examples ':has_one with JSONB store'
+    end
+  end
+
+  context 'when 2 associations on one model have the same foreign_key' do
+    it 'raises an error' do
+      expect do
+        class Foo < ActiveRecord::Base
+          belongs_to :bar, store: :extra, foreign_key: :bar_id
+          belongs_to :baz, store: :extra, foreign_key: :bar_id
+        end
+      end.to raise_error(
+        ActiveRecord::JSONB::Associations::ConflictingAssociation,
+        'Association with foreign key :bar_id already exists on Foo'
+      )
     end
   end
 end

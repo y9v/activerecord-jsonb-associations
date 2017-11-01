@@ -12,6 +12,7 @@ require 'activerecord/jsonb/associations/join_dependency/join_association'
 module ActiveRecord #:nodoc:
   module JSONB #:nodoc:
     module Associations #:nodoc:
+      class ConflictingAssociation < StandardError; end
     end
   end
 end
