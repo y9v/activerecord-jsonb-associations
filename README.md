@@ -4,7 +4,26 @@ Use PostgreSQL JSONB fields to store association information of your models.
 
 ## Usage
 
-TODO
+### One-to-one and One-to-many associations
+
+```ruby
+class Profile < ActiveRecord::Base
+  # Setting additional :store option on :belongs_to association
+  # enables saving of foreign ids in :extra JSONB column 
+  belongs_to :user, store: :extra
+end
+
+class SocialProfile < ActiveRecord::Base
+  belongs_to :user, store: :extra
+end
+
+class User < ActiveRecord::Base
+  # Parent model association needs to specify :foreign_store
+  # for associations with JSONB storage
+  has_one :profile, foreign_store: :extra
+  has_many :social_profiles, foreign_store: :extra
+end
+```
 
 ## Installation
 
