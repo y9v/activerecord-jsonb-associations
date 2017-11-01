@@ -6,6 +6,8 @@ require 'activerecord/jsonb/associations/builder/has_one'
 require 'activerecord/jsonb/associations/belongs_to_association'
 require 'activerecord/jsonb/associations/has_one_association'
 require 'activerecord/jsonb/associations/association_scope'
+require 'activerecord/jsonb/associations/preloader/has_one'
+require 'activerecord/jsonb/associations/join_dependency/join_association'
 
 module ActiveRecord #:nodoc:
   module JSONB #:nodoc:
@@ -33,5 +35,13 @@ ActiveSupport.on_load :active_record do
 
   ::ActiveRecord::Associations::AssociationScope.prepend(
     ActiveRecord::JSONB::Associations::AssociationScope
+  )
+
+  ::ActiveRecord::Associations::Preloader::HasOne.prepend(
+    ActiveRecord::JSONB::Associations::Preloader::HasOne
+  )
+
+  ::ActiveRecord::Associations::JoinDependency::JoinAssociation.prepend(
+    ActiveRecord::JSONB::Associations::JoinDependency::JoinAssociation
   )
 end

@@ -2,6 +2,7 @@ module ActiveRecord
   module JSONB
     module Associations
       module AssociationScope #:nodoc:
+        # rubocop:disable Metrics/MethodLength
         def last_chain_scope(scope, table, reflection, owner)
           reflection = reflection.instance_variable_get(:@reflection)
 
@@ -21,6 +22,7 @@ module ActiveRecord
             super
           end
         end
+        # rubocop:enable Metrics/MethodLength
 
         def apply_jsonb_scope(scope, table, jsonb_column, key, value)
           scope.where!(

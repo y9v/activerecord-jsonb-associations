@@ -27,6 +27,16 @@ module ActiveRecord
               def #{foreign_key}
                 #{reflection.options[:store]}['#{foreign_key}']
               end
+
+              def [](key)
+                key = key.to_s
+                if key.ends_with?('_id') &&
+                    #{reflection.options[:store]}.keys.include?(key)
+                  #{reflection.options[:store]}[key]
+                else
+                  super
+                end
+              end
             CODE
           end
         end

@@ -16,6 +16,7 @@ module ActiveRecord
           end
         end
 
+        # rubocop:disable Metrics/AbcSize
         def create_scope
           super.tap do |scope|
             next unless options.key?(:foreign_store)
@@ -24,6 +25,7 @@ module ActiveRecord
               owner[reflection.active_record_primary_key]
           end
         end
+        # rubocop:enable Metrics/AbcSize
       end
     end
   end

@@ -1,3 +1,4 @@
+# rubocop:disable Metrics/BlockLength
 RSpec.shared_examples ':has_one with JSONB store' do
   let(:child_name) { child_model.model_name.element }
 
@@ -79,28 +80,71 @@ RSpec.shared_examples ':has_one with JSONB store' do
       parent_model.send "#{child_name}=", child_model
     end
 
-    it 'reloads the association' do
+    it 'reloads association' do
       expect(parent_model.send("reload_#{child_name}")).to eq(child_model)
     end
   end
+
+  describe '#preload / #includes' do
+    let(:parent_class) do
+      parent_model.class
+    end
+
+    let(:child_class) do
+      child_model.class
+    end
+
+    before do
+      parent_class.destroy_all
+      3.times do
+        parent_instance = parent_class.create
+        parent_instance.send "create_#{child_name}"
+      end
+    end
+
+    it 'preloads association' do
+      expect(count_queries do
+        records = parent_class.all.preload(child_name)
+        records.map do |record|
+          record.send(child_name).id
+        end
+      end).to eq(2)
+    end
+  end
+
+  describe '#eager_load / #joins' do
+    let(:parent_class) do
+      parent_model.class
+    end
+
+    let(:child_class) do
+      child_model.class
+    end
+
+    before do
+      parent_class.destroy_all
+      3.times do
+        parent_instance = parent_class.create
+        parent_instance.send "create_#{child_name}"
+      end
+    end
+
+    it 'preloads association' do
+      expect(count_queries do
+        parent_class.all.eager_load(child_name).map do |record|
+          record.send(child_name)
+        end
+      end).to eq(1)
+    end
+  end
 end
+# rubocop:enable Metrics/BlockLength
 
 RSpec.describe ':has_one' do
   context 'regular association' do
     let(:parent_model) { User.create }
     let(:child_model) { Profile.new }
-
-    describe '#create_association' do
-      let(:created_association) do
-        parent_model.send "create_profile"
-      end
-
-      it 'sets and persists foreign key on child model' do
-        expect(
-          created_association.reload.user_id
-        ).to eq(parent_model.id)
-      end
-    end
+    let(:child_name) { child_model.model_name.element }
   end
 
   context 'association with :store option set on child model' do
