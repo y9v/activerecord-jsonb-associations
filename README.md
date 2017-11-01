@@ -2,6 +2,10 @@
 
 Use PostgreSQL JSONB fields to store association information of your models.
 
+**Requirements:**
+
+- PostgreSQL (>= 9.4)
+
 ## Usage
 
 ### One-to-one and One-to-many associations
