@@ -1,13 +1,16 @@
 require 'bundler/setup'
 require 'database_cleaner'
+require 'factory_bot'
 
 require 'activerecord/jsonb/associations'
 
 require 'support/helpers/queries_counter'
 require 'support/schema'
 require 'support/models'
+require 'support/factories'
 
 RSpec.configure do |config|
+  config.include FactoryBot::Syntax::Methods
   config.include Helpers::QueriesCounter
 
   config.before(:suite) do

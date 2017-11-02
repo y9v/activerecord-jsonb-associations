@@ -4,6 +4,12 @@ class User < ActiveRecord::Base
 
   # :has_one association with JSONB store
   has_one :account, foreign_store: :extra
+
+  # regular :has_many_association
+  has_many :photos
+
+  # :has_many association with JSONB store
+  has_many :social_profiles, foreign_store: :extra
 end
 
 class GoodsSupplier < ActiveRecord::Base
@@ -12,6 +18,12 @@ class GoodsSupplier < ActiveRecord::Base
   has_one :account, foreign_store: :extra,
                     foreign_key: :supplier_id,
                     inverse_of: :supplier
+
+  # :has_many association with JSONB store
+  # and non-default :foreign_key
+  has_many :invoice_photos, foreign_store: :extra,
+                            foreign_key: :supplier_id,
+                            inverse_of: :supplier
 end
 
 class Profile < ActiveRecord::Base
@@ -21,4 +33,16 @@ end
 class Account < ActiveRecord::Base
   belongs_to :user, store: :extra
   belongs_to :supplier, store: :extra, class_name: 'GoodsSupplier'
+end
+
+class Photo < ActiveRecord::Base
+  belongs_to :user
+end
+
+class InvoicePhoto < ActiveRecord::Base
+  belongs_to :supplier, store: :extra, class_name: 'GoodsSupplier'
+end
+
+class SocialProfile < ActiveRecord::Base
+  belongs_to :user, store: :extra
 end

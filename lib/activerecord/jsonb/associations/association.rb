@@ -1,7 +1,7 @@
 module ActiveRecord
   module JSONB
     module Associations
-      module HasOneAssociation #:nodoc:
+      module Association #:nodoc:
         def creation_attributes
           if reflection.options.key?(:foreign_store)
             attributes = {}

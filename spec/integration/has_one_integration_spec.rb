@@ -1,12 +1,9 @@
 # rubocop:disable Metrics/BlockLength
 RSpec.shared_examples ':has_one association' do |store_type:|
+  let(:parent_class) { parent_model.class }
+  let(:child_class) { child_model.class }
+  let(:parent_name) { parent_model.model_name.element }
   let(:child_name) { child_model.model_name.element }
-
-  describe '#association' do
-    before do
-      child_model.update
-    end
-  end
 
   describe '#association' do
     before do
@@ -108,26 +105,14 @@ RSpec.shared_examples ':has_one association' do |store_type:|
   end
 
   describe '#preload / #includes' do
-    let(:parent_class) do
-      parent_model.class
-    end
-
-    let(:child_class) do
-      child_model.class
-    end
-
     before do
       parent_class.destroy_all
-      3.times do
-        parent_instance = parent_class.create
-        parent_instance.send "create_#{child_name}"
-      end
+      create_list(child_name, 3, "with_#{parent_name}".to_sym)
     end
 
-    it 'preloads association' do
+    it 'makes 2 queries' do
       expect(count_queries do
-        records = parent_class.all.preload(child_name)
-        records.map do |record|
+        parent_class.all.preload(child_name).map do |record|
           record.send(child_name).id
         end
       end).to eq(2)
@@ -135,23 +120,12 @@ RSpec.shared_examples ':has_one association' do |store_type:|
   end
 
   describe '#eager_load / #joins' do
-    let(:parent_class) do
-      parent_model.class
-    end
-
-    let(:child_class) do
-      child_model.class
-    end
-
     before do
       parent_class.destroy_all
-      3.times do
-        parent_instance = parent_class.create
-        parent_instance.send "create_#{child_name}"
-      end
+      create_list(child_name, 3, "with_#{parent_name}".to_sym)
     end
 
-    it 'preloads association' do
+    it 'makes 1 query' do
       expect(count_queries do
         parent_class.all.eager_load(child_name).map do |record|
           record.send(child_name)

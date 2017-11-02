@@ -29,6 +29,8 @@ class User < ActiveRecord::Base
 end
 ```
 
+Foreign keys for association on one model have to be unique, even if they use different store column.
+
 ## Installation
 
 Add this line to your application's Gemfile:

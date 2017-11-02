@@ -10,14 +10,10 @@ module ActiveRecord
             join_keys = reflection.join_keys
             value = transform_value(owner[join_keys.foreign_key])
 
-            if value.is_a?(Integer)
-              scope = apply_jsonb_scope(
-                scope, table, reflection.options[:foreign_store],
-                join_keys.key, value
-              )
-            end
-
-            scope
+            apply_jsonb_scope(
+              scope, table, reflection.options[:foreign_store],
+              join_keys.key, value
+            )
           else
             super
           end
@@ -26,9 +22,14 @@ module ActiveRecord
 
         def apply_jsonb_scope(scope, table, jsonb_column, key, value)
           scope.where!(
-            "(#{table.name}.#{jsonb_column}->>'#{key}')::int = :id",
-            id: value
-          )
+            Arel::Nodes::JSONBDashArrow.new(
+              table, jsonb_column, key
+            ).eq(Arel::Nodes::BindParam.new)
+          ).tap do |arel_scope|
+            arel_scope.where_clause.binds << Relation::QueryAttribute.new(
+              key.to_s, value, ActiveModel::Type::String.new
+            )
+          end
         end
       end
     end
