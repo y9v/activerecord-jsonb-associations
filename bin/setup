@@ -26,6 +26,6 @@ FileUtils.chdir(Pathname.new(File.expand_path('../../', __FILE__))) do
   end
 
   puts "\n== Creating test database =="
-  system! 'dropdb activerecord_jsonb_associations_test'
+  system! 'dropdb activerecord_jsonb_associations_test --if-exists'
   system! 'createdb activerecord_jsonb_associations_test'
 end
