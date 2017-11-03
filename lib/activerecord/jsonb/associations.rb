@@ -11,6 +11,7 @@ require 'activerecord/jsonb/associations/has_many_association'
 require 'activerecord/jsonb/associations/association_scope'
 require 'activerecord/jsonb/associations/preloader/association'
 require 'activerecord/jsonb/associations/join_dependency/join_association'
+require 'activerecord/jsonb/connection_adapters/reference_definition'
 
 module ActiveRecord #:nodoc:
   module JSONB #:nodoc:
@@ -56,6 +57,10 @@ ActiveSupport.on_load :active_record do
 
   ::ActiveRecord::Associations::JoinDependency::JoinAssociation.prepend(
     ActiveRecord::JSONB::Associations::JoinDependency::JoinAssociation
+  )
+
+  ::ActiveRecord::ConnectionAdapters::ReferenceDefinition.prepend(
+    ActiveRecord::JSONB::ConnectionAdapters::ReferenceDefinition
   )
 end
 # rubocop:enable Metrics/BlockLength

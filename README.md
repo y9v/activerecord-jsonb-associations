@@ -31,6 +31,12 @@ end
 
 Foreign keys for association on one model have to be unique, even if they use different store column.
 
+You can also use `add_references` in your migration to add JSONB column and index for it (if `index: true` option is set):
+
+```ruby
+add_reference :profiles, :users, store: :extra, index: true
+```
+
 ## Installation
 
 Add this line to your application's Gemfile:
