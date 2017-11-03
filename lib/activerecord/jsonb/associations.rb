@@ -1,5 +1,4 @@
 require 'active_record'
-require 'pry'
 
 require 'arel/nodes/jsonb_dash_arrow'
 require 'activerecord/jsonb/associations/builder/belongs_to'
