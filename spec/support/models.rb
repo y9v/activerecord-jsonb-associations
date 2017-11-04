@@ -10,6 +10,12 @@ class User < ActiveRecord::Base
 
   # :has_many association with JSONB store
   has_many :social_profiles, foreign_store: :extra
+
+  # :has_and_belongs_to_many association with JSONB store
+  has_and_belongs_to_many :labels, store: :extra
+
+  # regular :has_and_belongs_to_many association
+  has_and_belongs_to_many :groups
 end
 
 class GoodsSupplier < ActiveRecord::Base
@@ -45,4 +51,12 @@ end
 
 class SocialProfile < ActiveRecord::Base
   belongs_to :user, store: :extra
+end
+
+class Label < ActiveRecord::Base
+  has_and_belongs_to_many :users, store: :extra
+end
+
+class Group < ActiveRecord::Base
+  has_and_belongs_to_many :users
 end

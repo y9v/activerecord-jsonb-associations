@@ -17,6 +17,7 @@ ActiveRecord::Migration.verbose = false
 # rubocop:disable Metrics/BlockLength
 ActiveRecord::Schema.define do
   create_table :users, force: true do |t|
+    t.jsonb :extra, null: false, default: {}
     t.timestamps null: false
   end
 
@@ -30,7 +31,8 @@ ActiveRecord::Schema.define do
   end
 
   create_table :accounts, force: true do |t|
-    t.jsonb :extra, null: false, default: {}
+    t.references :user, store: :extra, index: true
+    t.references :supplier, store: :extra, index: true
     t.timestamps null: false
   end
 
@@ -40,13 +42,27 @@ ActiveRecord::Schema.define do
   end
 
   create_table :invoice_photos, force: true do |t|
-    t.jsonb :extra, null: false, default: {}
+    t.references :supplier, store: :extra, index: true
     t.timestamps null: false
   end
 
   create_table :social_profiles, force: true do |t|
+    t.references :user, store: :extra, index: true
+    t.timestamps null: false
+  end
+
+  create_table :labels, force: true do |t|
     t.jsonb :extra, null: false, default: {}
     t.timestamps null: false
+  end
+
+  create_table :groups, force: true do |t|
+    t.timestamps null: false
+  end
+
+  create_table :groups_users, force: true do |t|
+    t.belongs_to :user
+    t.belongs_to :group
   end
 end
 # rubocop:enable Metrics/BlockLength

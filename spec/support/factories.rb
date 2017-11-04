@@ -1,5 +1,25 @@
+# rubocop:disable Metrics/BlockLength
 FactoryBot.define do
   factory :user do
+    trait :with_groups do
+      transient do
+        groups_count 3
+      end
+
+      after(:create) do |user, evaluator|
+        create_list :group, evaluator.groups_count, users: [user]
+      end
+    end
+
+    trait :with_labels do
+      transient do
+        labels_count 3
+      end
+
+      after(:create) do |user, evaluator|
+        create_list :label, evaluator.labels_count, users: [user]
+      end
+    end
   end
 
   factory :goods_supplier do
@@ -31,4 +51,20 @@ FactoryBot.define do
 
   factory :invoice_photo do
   end
+
+  factory :label do
+  end
+
+  factory :group do
+    trait :with_users do
+      transient do
+        users_count 3
+      end
+
+      after(:create) do |group, evaluator|
+        group.users = create_list(:user, evaluator.users_count)
+      end
+    end
+  end
 end
+# rubocop:enable Metrics/BlockLength

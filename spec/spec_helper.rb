@@ -1,6 +1,7 @@
 require 'bundler/setup'
 require 'database_cleaner'
 require 'factory_bot'
+require 'pry'
 
 require 'activerecord/jsonb/associations'
 

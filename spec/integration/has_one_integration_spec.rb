@@ -1,5 +1,5 @@
 # rubocop:disable Metrics/BlockLength
-RSpec.shared_examples ':has_one association' do |store_type:|
+RSpec.shared_examples ':has_one association' do |store_type: :regular|
   let(:parent_class) { parent_model.class }
   let(:child_class) { child_model.class }
   let(:parent_name) { parent_model.model_name.element }
@@ -137,7 +137,7 @@ end
 
 RSpec.describe ':has_one' do
   context 'regular association' do
-    include_examples ':has_one association', store_type: :regular do
+    include_examples ':has_one association' do
       let(:parent_model) { User.create }
       let(:child_model) { Profile.new }
       let(:foreign_key) { :user_id }

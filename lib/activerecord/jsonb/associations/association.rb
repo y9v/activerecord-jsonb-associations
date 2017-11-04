@@ -3,17 +3,15 @@ module ActiveRecord
     module Associations
       module Association #:nodoc:
         def creation_attributes
-          if reflection.options.key?(:foreign_store)
-            attributes = {}
-            jsonb_store = reflection.options[:foreign_store]
-            attributes[jsonb_store] ||= {}
-            attributes[jsonb_store][reflection.foreign_key] =
-              owner[reflection.active_record_primary_key]
+          return super unless reflection.options.key?(:foreign_store)
 
-            attributes
-          else
-            super
-          end
+          attributes = {}
+          jsonb_store = reflection.options[:foreign_store]
+          attributes[jsonb_store] ||= {}
+          attributes[jsonb_store][reflection.foreign_key] =
+            owner[reflection.active_record_primary_key]
+
+          attributes
         end
 
         # rubocop:disable Metrics/AbcSize

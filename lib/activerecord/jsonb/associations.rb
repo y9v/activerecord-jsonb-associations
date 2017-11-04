@@ -1,6 +1,7 @@
 require 'active_record'
 
-require 'arel/nodes/jsonb_dash_arrow'
+require 'arel/nodes/jsonb_operators'
+require 'activerecord/jsonb/associations/class_methods'
 require 'activerecord/jsonb/associations/builder/belongs_to'
 require 'activerecord/jsonb/associations/builder/has_one'
 require 'activerecord/jsonb/associations/builder/has_many'
@@ -9,6 +10,7 @@ require 'activerecord/jsonb/associations/association'
 require 'activerecord/jsonb/associations/has_many_association'
 require 'activerecord/jsonb/associations/association_scope'
 require 'activerecord/jsonb/associations/preloader/association'
+require 'activerecord/jsonb/associations/preloader/has_many'
 require 'activerecord/jsonb/associations/join_dependency/join_association'
 require 'activerecord/jsonb/connection_adapters/reference_definition'
 
@@ -22,6 +24,10 @@ end
 
 # rubocop:disable Metrics/BlockLength
 ActiveSupport.on_load :active_record do
+  ::ActiveRecord::Base.extend(
+    ActiveRecord::JSONB::Associations::ClassMethods
+  )
+
   ::ActiveRecord::Associations::Builder::BelongsTo.extend(
     ActiveRecord::JSONB::Associations::Builder::BelongsTo
   )
@@ -52,6 +58,10 @@ ActiveSupport.on_load :active_record do
 
   ::ActiveRecord::Associations::Preloader::Association.prepend(
     ActiveRecord::JSONB::Associations::Preloader::Association
+  )
+
+  ::ActiveRecord::Associations::Preloader::HasMany.prepend(
+    ActiveRecord::JSONB::Associations::Preloader::HasMany
   )
 
   ::ActiveRecord::Associations::JoinDependency::JoinAssociation.prepend(
