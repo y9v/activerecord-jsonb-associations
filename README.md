@@ -37,6 +37,22 @@ You can also use `add_references` in your migration to add JSONB column and inde
 add_reference :profiles, :users, store: :extra, index: true
 ```
 
+### Many-to-many associations
+
+```ruby
+class Label < ActiveRecord::Base
+  # extra['user_ids'] will store associated user ids
+  has_and_belongs_to_many :users, store: :extra
+end
+
+class User < ActiveRecord::Base
+  # extra['label_ids'] will store associated label ids
+  has_and_belongs_to_many :labels, store: :extra
+end
+```
+
+TODO: add benchmarks for regular vs. jsonb HABTM associations.
+
 ## Installation
 
 Add this line to your application's Gemfile:
