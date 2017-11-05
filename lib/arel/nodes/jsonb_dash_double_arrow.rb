@@ -4,10 +4,6 @@ module Arel
       def operator
         '->>'
       end
-
-      def as_int
-        ::Arel::Nodes::NamedFunction.new('CAST', [as('int')])
-      end
     end
   end
 end
