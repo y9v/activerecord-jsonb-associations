@@ -34,8 +34,8 @@ module ActiveRecord
 
           column_names.each do |column_name|
             table.index(
-              "(#{store}->'#{column_name}')",
-              using: :gin,
+              "(#{store}->>'#{column_name}')",
+              using: :hash,
               name: "index_#{table.name}_on_#{store}_#{column_name}"
             )
           end

@@ -32,7 +32,25 @@ RSpec.describe ':add_references migration command' do
 
     it 'creates index on foo->>user_id' do
       expect(foo_index_on_user_id).to be_present
-      expect(foo_index_on_user_id.columns).to eq("((foo -> 'user_id'::text))")
+      expect(foo_index_on_user_id.columns).to eq("((foo ->> 'user_id'::text))")
+    end
+  end
+
+  describe 'index usage' do
+    let(:parent) { create :user }
+    let!(:children) { create_list :social_profile, 3, user: parent }
+    let(:index_name) { 'index_social_profiles_on_extra_user_id' }
+
+    it 'does index scan when getting associated models' do
+      expect(
+        parent.social_profiles.explain
+      ).to include("Bitmap Index Scan on #{index_name}")
+    end
+
+    it 'does index scan on #eager_load' do
+      expect(
+        User.all.eager_load(:social_profiles).explain
+      ).to include("Bitmap Index Scan on #{index_name}")
     end
   end
 end
