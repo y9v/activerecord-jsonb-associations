@@ -1,0 +1,79 @@
+$LOAD_PATH.unshift('./spec')
+require 'rspec'
+require 'spec_helper'
+require 'benchmark/ips'
+
+# rubocop:disable Metrics/BlockLength
+namespace :benchmarks do
+  desc 'Regular vs JSONB HABTM benchmarks'
+  task :habtm do
+    (10..5_010).step(500).to_a.each do |associations_count|
+      user = User.create
+      user_with_groups_only = User.create
+      user_with_labels_only = User.create
+
+      FactoryBot.create_list :group,
+                             associations_count,
+                             users: [user, user_with_groups_only]
+
+      FactoryBot.create_list :label,
+                             associations_count,
+                             users: [user, user_with_labels_only]
+
+      Benchmark.ips do |x|
+        x.config(warmup: 0)
+
+        x.report(
+          "Regular: adding new association to #{associations_count} existing"
+        ) do
+          ActiveRecord::Base.transaction do
+            user.groups.create
+            raise ActiveRecord::Rollback
+          end
+        end
+
+        x.report(
+          "JSONB: adding new association to #{associations_count} existing"
+        ) do
+          ActiveRecord::Base.transaction do
+            user.labels.create
+            raise ActiveRecord::Rollback
+          end
+        end
+
+        x.compare!
+      end
+
+      Benchmark.ips do |x|
+        x.config(warmup: 0)
+
+        x.report(
+          'Regular: removing association with on model with '\
+          "#{associations_count} associations"
+        ) do
+          ActiveRecord::Base.transaction do
+            user_with_groups_only.destroy
+            raise ActiveRecord::Rollback
+          end
+        end
+
+        x.report(
+          'JSONB: removing association with on model with '\
+          "#{associations_count} associations"
+        ) do
+          ActiveRecord::Base.transaction do
+            user_with_labels_only.destroy
+            raise ActiveRecord::Rollback
+          end
+        end
+
+        x.compare!
+      end
+
+      User.delete_all
+      Group.delete_all
+      Label.delete_all
+    end
+  end
+end
+# rubocop:enable Metrics/BlockLength

@@ -53,6 +53,15 @@ FactoryBot.define do
   end
 
   factory :label do
+    trait :with_users do
+      transient do
+        users_count 3
+      end
+
+      after(:create) do |label, evaluator|
+        label.users = create_list(:user, evaluator.users_count)
+      end
+    end
   end
 
   factory :group do

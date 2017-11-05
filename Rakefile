@@ -4,6 +4,8 @@ rescue LoadError
   puts 'You must `gem install bundler` and `bundle install` to run rake tasks'
 end
 
+Rake.add_rakelib 'benchmarks'
+
 require 'rdoc/task'
 
 RDoc::Task.new(:rdoc) do |rdoc|
