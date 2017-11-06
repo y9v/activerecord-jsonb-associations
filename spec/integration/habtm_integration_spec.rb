@@ -171,22 +171,42 @@ RSpec.shared_examples(
       store_type == :jsonb ? 2 : 3
     end
 
+    subject(:records) { parent_class.all.preload(child_association_name) }
+
     it 'makes 2 queries' do
       expect(count_queries do
-        parent_class.all.preload(child_association_name).map do |parent|
+        records.map do |parent|
           parent.send(child_association_name).map(&:id)
         end
       end).to eq(expected_queries_count)
     end
+
+    it 'preloads associated records attributes' do
+      expect(
+        records.map do |record|
+          record.send(child_association_name).map(&:id).compact.count
+        end
+      ).to all(eq(3))
+    end
   end
 
   describe '#eager_load / #joins' do
+    subject(:records) { parent_class.all.eager_load(child_association_name) }
+
     it 'makes 1 query' do
       expect(count_queries do
-        parent_class.all.eager_load(child_association_name).map do |record|
+        records.map do |record|
           record.send(child_association_name).map(&:id)
         end
       end).to eq(1)
+    end
+
+    it 'preloads associated records attributes' do
+      expect(
+        records.map do |record|
+          record.send(child_association_name).map(&:id).compact.count
+        end
+      ).to all(eq(3))
     end
   end
 end

@@ -50,7 +50,7 @@ RSpec.describe ':add_references migration command' do
     it 'does index scan on #eager_load' do
       expect(
         User.all.eager_load(:social_profiles).explain
-      ).to include("Bitmap Index Scan on #{index_name}")
+      ).to include("Index Scan using #{index_name}")
     end
   end
 end

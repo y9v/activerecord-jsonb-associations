@@ -40,6 +40,21 @@ module ActiveRecord
             end
           end
           # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
+
+          # rubocop:disable Metrics/AbcSize
+          def load_records(&block)
+            return super unless reflection.options.key?(:store)
+
+            return {} if owner_keys.empty?
+            @preloaded_records = records_for(owner_keys).load(&block)
+            @preloaded_records.each_with_object({}) do |record, result|
+              record[association_key_name].each do |owner_key|
+                result[convert_key(owner_key)] ||= []
+                result[convert_key(owner_key)] << record
+              end
+            end
+          end
+          # rubocop:enable Metrics/AbcSize
         end
       end
     end
