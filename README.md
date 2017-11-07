@@ -59,11 +59,9 @@ end
 
 #### Performance
 
-In general you are safe to use JSONB HABTM for models that won't have many associations on both sides.
+Compared to regular associations, fetching models associated via JSONB column has no drops in performance.
 
-If you plan to have associations where one side has many records on the other side (more then ~500), adding new records to existing associations scope will be slower then with traditional approach.
-
-Below you can see benchmark results for adding new associations to the association scope:
+Adding new connections is slightly faster with JSONB, for scopes up to 500 records connected to another record (total count of records in the table does not matter that much. If you have more then ~500 records connected to one record on average, and you want to add new records to the scope, JSONB associations will be slower then traditional:
 
 <img src="https://github.com/lebedev-yury/activerecord-jsonb-associations/blob/master/doc/images/adding-associations.png?raw=true | width=500" alt="JSONB HAMTB is slower on adding associations" width="600">
 

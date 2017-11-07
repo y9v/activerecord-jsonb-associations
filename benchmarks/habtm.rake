@@ -7,7 +7,9 @@ require 'benchmark/ips'
 namespace :benchmarks do
   desc 'Regular vs JSONB HABTM benchmarks'
   task :habtm do
-    (10..5_010).step(500).to_a.each do |associations_count|
+    [
+      10, 100, 500, 1000, 2_500, 5_000, 10_000
+    ].to_a.each do |associations_count|
       user = User.create
       user_with_groups_only = User.create
       user_with_labels_only = User.create
@@ -19,6 +21,54 @@ namespace :benchmarks do
       FactoryBot.create_list :label,
                              associations_count,
                              users: [user, user_with_labels_only]
+
+      Benchmark.ips do |x|
+        x.config(warmup: 0)
+
+        x.report(
+          "Regular: fetching associations with #{associations_count} existing"
+        ) do
+          ActiveRecord::Base.transaction do
+            Group.uncached { user.groups.reload }
+            raise ActiveRecord::Rollback
+          end
+        end
+
+        x.report(
+          "JSONB: fetching associations with #{associations_count} existing"
+        ) do
+          ActiveRecord::Base.transaction do
+            Label.uncached { user.labels.reload }
+            raise ActiveRecord::Rollback
+          end
+        end
+
+        x.compare!
+      end
+
+      Benchmark.ips do |x|
+        x.config(warmup: 0)
+
+        x.report(
+          "Regular: getting association ids with #{associations_count} existing"
+        ) do
+          ActiveRecord::Base.transaction do
+            Group.uncached { user.group_ids }
+            raise ActiveRecord::Rollback
+          end
+        end
+
+        x.report(
+          "JSONB: getting association ids with #{associations_count} existing"
+        ) do
+          ActiveRecord::Base.transaction do
+            Label.uncached { user.label_ids }
+            raise ActiveRecord::Rollback
+          end
+        end
+
+        x.compare!
+      end
 
       Benchmark.ips do |x|
         x.config(warmup: 0)

@@ -58,19 +58,25 @@ module ActiveRecord
         end
         # rubocop:enable Metrics/AbcSize
 
-        # rubocop:disable Metrics/AbcSize
+        # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
         def insert_record(record, validate = true, raise = false)
-          super.tap do
+          super.tap do |super_result|
             next unless options.key?(:store)
+            next unless super_result
 
             key = "#{record.model_name.singular}_ids"
-            store = owner[options[:store]] || {}
-            store[key] ||= []
-            store[key] << record.id
-            owner.update_column(options[:store], store)
+            jsonb_column = options[:store]
+
+            owner.class.where(
+              owner.class.primary_key => owner[owner.class.primary_key]
+            ).update_all(%(
+              #{jsonb_column} = jsonb_set(#{jsonb_column}, '{#{key}}',
+              coalesce(#{jsonb_column}->'#{key}', '[]'::jsonb) ||
+              '[#{record[klass.primary_key]}]'::jsonb)
+            ))
           end
         end
-        # rubocop:enable Metrics/AbcSize
+        # rubocop:enable Metrics/MethodLength, Metrics/AbcSize
 
         def delete_records(records, method)
           return super unless options.key?(:store)
