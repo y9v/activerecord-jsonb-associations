@@ -74,6 +74,30 @@ namespace :benchmarks do
         x.config(warmup: 0)
 
         x.report(
+          "Regular: #count on association with #{associations_count} existing"
+        ) do
+          ActiveRecord::Base.transaction do
+            Group.uncached { user.groups.count }
+            raise ActiveRecord::Rollback
+          end
+        end
+
+        x.report(
+          "JSONB: #count on association with #{associations_count} existing"
+        ) do
+          ActiveRecord::Base.transaction do
+            Label.uncached { user.labels.count }
+            raise ActiveRecord::Rollback
+          end
+        end
+
+        x.compare!
+      end
+
+      Benchmark.ips do |x|
+        x.config(warmup: 0)
+
+        x.report(
           "Regular: adding new association to #{associations_count} existing"
         ) do
           ActiveRecord::Base.transaction do

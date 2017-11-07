@@ -2,6 +2,16 @@ module ActiveRecord
   module JSONB
     module Associations
       module HasManyAssociation #:nodoc:
+        def ids_reader
+          return super unless reflection.options.key?(:store)
+
+          Array(
+            owner[reflection.options[:store]][
+              "#{reflection.name.to_s.singularize}_ids"
+            ]
+          )
+        end
+
         # rubocop:disable Naming/AccessorMethodName
         def set_owner_attributes(record)
           return super unless reflection.options.key?(:store)

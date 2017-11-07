@@ -61,6 +61,8 @@ end
 
 Compared to regular associations, fetching models associated via JSONB column has no drops in performance.
 
+Getting the count of connected records is ~35% faster with associations via JSONB (tested on associations with up to 10 000 connections).
+
 Adding new connections is slightly faster with JSONB, for scopes up to 500 records connected to another record (total count of records in the table does not matter that much. If you have more then ~500 records connected to one record on average, and you want to add new records to the scope, JSONB associations will be slower then traditional:
 
 <img src="https://github.com/lebedev-yury/activerecord-jsonb-associations/blob/master/doc/images/adding-associations.png?raw=true | width=500" alt="JSONB HAMTB is slower on adding associations" width="600">
