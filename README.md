@@ -1,4 +1,4 @@
-# Activerecord::Jsonb::Associations
+# activerecord-json-associations
 
 Use PostgreSQL JSONB fields to store association information of your models.
 
