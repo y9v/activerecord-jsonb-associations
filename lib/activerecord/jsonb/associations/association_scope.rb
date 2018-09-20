@@ -9,7 +9,7 @@ module ActiveRecord
 
           join_keys = reflection.join_keys
           key = join_keys.key
-          value = transform_value(owner[reflection.join_keys.foreign_key])
+          value = transform_value(owner[join_keys.foreign_key])
 
           if reflection.options.key?(:foreign_store)
             apply_jsonb_scope(

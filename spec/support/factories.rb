@@ -3,7 +3,7 @@ FactoryBot.define do
   factory :user do
     trait :with_groups do
       transient do
-        groups_count 3
+        groups_count { 3 }
       end
 
       after(:create) do |user, evaluator|
@@ -13,7 +13,7 @@ FactoryBot.define do
 
     trait :with_labels do
       transient do
-        labels_count 3
+        labels_count { 3 }
       end
 
       after(:create) do |user, evaluator|
@@ -55,7 +55,7 @@ FactoryBot.define do
   factory :label do
     trait :with_users do
       transient do
-        users_count 3
+        users_count { 3 }
       end
 
       after(:create) do |label, evaluator|
@@ -67,7 +67,7 @@ FactoryBot.define do
   factory :group do
     trait :with_users do
       transient do
-        users_count 3
+        users_count { 3 }
       end
 
       after(:create) do |group, evaluator|
