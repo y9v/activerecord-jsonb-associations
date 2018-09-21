@@ -35,11 +35,30 @@ module ActiveRecord
                 #{reflection.options[:store]}['#{foreign_key}']
               end
 
+              def _read_attribute(attr_name)
+                key = attr_name.to_s
+                if key.ends_with?('_id') && #{reflection.options[:store]}.keys.include?(key)
+                  #{reflection.options[:store]}[key]
+                else
+                  super
+                end
+              end
+
               def [](key)
                 key = key.to_s
                 if key.ends_with?('_id') &&
                     #{reflection.options[:store]}.keys.include?(key)
                   #{reflection.options[:store]}[key]
+                else
+                  super
+                end
+              end
+
+              def []=(key, value)
+                key = key.to_s
+                if key.ends_with?('_id') &&
+                    #{reflection.options[:store]}.keys.include?(key)
+                  #{reflection.options[:store]}[key] = value
                 else
                   super
                 end

@@ -10,7 +10,12 @@ module ActiveRecord
                 table, table[reflection.options[:foreign_store]],
                 key, foreign_table, foreign_key
               )
-            elsif reflection.options.key?(:store)
+            elsif reflection.options.key?(:store) && reflection.belongs_to?
+              build_eq_constraint(
+                foreign_table, foreign_table[reflection.options[:store]],
+                foreign_key, table, key
+              )
+            elsif reflection.options.key?(:store) # && reflection.has_one?
               build_contains_constraint(
                 table, table[reflection.options[:store]],
                 key.pluralize, foreign_table, foreign_key

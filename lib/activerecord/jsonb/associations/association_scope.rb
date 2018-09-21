@@ -18,6 +18,7 @@ module ActiveRecord
               key, value
             )
           elsif reflection && reflection.options.key?(:store)
+            return super if reflection.belongs_to?
             pluralized_key = key.pluralize
 
             apply_jsonb_scope(

@@ -35,6 +35,10 @@ FactoryBot.define do
     trait :with_goods_supplier do
       association :supplier, factory: :supplier
     end
+
+    trait :with_supplier do
+      with_goods_supplier
+    end
   end
 
   factory :profile do

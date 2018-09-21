@@ -38,7 +38,9 @@ end
 
 class Account < ActiveRecord::Base
   belongs_to :user, store: :extra
-  belongs_to :supplier, store: :extra, class_name: 'GoodsSupplier'
+  belongs_to :supplier, store: :extra,
+                        inverse_of: :account,
+                        class_name: 'GoodsSupplier'
 end
 
 class Photo < ActiveRecord::Base
